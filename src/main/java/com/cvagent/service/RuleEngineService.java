@@ -33,9 +33,6 @@ public class RuleEngineService {
     @Autowired
     private RuleVersionControlService versionControlService;
 
-    @Autowired
-    private RuleEffectEvaluationService effectEvaluationService;
-
     /**
      * 应用所有规则到简历内容
      */

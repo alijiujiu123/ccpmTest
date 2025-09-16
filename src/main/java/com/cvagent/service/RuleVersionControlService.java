@@ -30,9 +30,6 @@ public class RuleVersionControlService {
     @Autowired
     private OptimizationRuleRepository ruleRepository;
 
-    @Autowired
-    private RuleEngineService ruleEngineService;
-
     /**
      * 创建规则新版本
      */
