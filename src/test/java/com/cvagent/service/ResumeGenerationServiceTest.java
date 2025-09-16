@@ -56,6 +56,21 @@ public class ResumeGenerationServiceTest {
         testResume.setUserId("test-user-id");
         testResume.setTitle("测试简历");
         testResume.setVersion("1.0");
+        testResume.setMatchScore(0.85);
+        testResume.setOptimizationStatus("completed");
+
+        // 初始化技能
+        EnhancedResume.Skills skills = new EnhancedResume.Skills();
+        skills.setTechnicalSkills(List.of("Java", "Spring", "MySQL"));
+        testResume.setSkills(skills);
+
+        // 确保其他内部类也被初始化
+        testResume.setWorkExperience(new EnhancedResume.WorkExperience());
+        testResume.setEducation(new EnhancedResume.Education());
+        testResume.setProjects(new EnhancedResume.Projects());
+        testResume.setCertifications(new EnhancedResume.Certifications());
+        testResume.setLanguages(new EnhancedResume.Languages());
+        testResume.setInterests(new EnhancedResume.Interests());
 
         testJobRequirement = new JobRequirement();
         testJobRequirement.setId("test-job-id");

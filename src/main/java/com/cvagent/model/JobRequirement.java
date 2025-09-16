@@ -119,4 +119,11 @@ public class JobRequirement {
     public void updateTimestamp() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    /**
+     * 获取工作经验要求
+     */
+    public String getExperience() {
+        return this.experienceLevel;
+    }
 }

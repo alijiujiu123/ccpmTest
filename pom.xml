@@ -102,7 +102,8 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
-        <!-- PDF Generation -->
+        <!-- PDF Generation - temporarily commented out due to dependency issues -->
+        <!--
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itext7-core</artifactId>
@@ -113,6 +114,7 @@
             <artifactId>html2pdf</artifactId>
             <version>4.0.3</version>
         </dependency>
+        -->
 
         <!-- Utils -->
         <dependency>
