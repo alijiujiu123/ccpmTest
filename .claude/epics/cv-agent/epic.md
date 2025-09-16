@@ -4,7 +4,7 @@ status: backlog
 created: 2025-09-15T12:03:04Z
 progress: 0%
 prd: .claude/prds/cv-agent.md
-github: [Will be updated when synced to GitHub]
+github: https://github.com/alijiujiu123/ccpmTest/issues/1
 ---
 
 # Epic: cv-agent
@@ -106,18 +106,17 @@ github: [Will be updated when synced to GitHub]
 - **风险因素**：第三方API成本控制、大文件处理性能优化
 
 ## Tasks Created
-- [ ] 001.md - 项目环境搭建和基础配置 (parallel: true)
-- [ ] 002.md - 用户认证和权限管理系统 (parallel: true)
-- [ ] 003.md - 数据库集成和数据模型设计 (parallel: true)
-- [ ] 004.md - 文件上传和处理系统 (parallel: true)
-- [ ] 005.md - 项目信息管理系统 (parallel: true)
-- [ ] 006.md - AI服务集成和配置 (parallel: true)
-- [ ] 007.md - 简历优化规则引擎 (parallel: true)
-- [ ] 008.md - 简历生成和导出系统 (parallel: true)
-- [ ] 009.md - 求职信生成系统 (parallel: true)
-- [ ] 010.md - 前端界面开发和集成 (parallel: true)
+- [ ] #10 - 求职信生成系统 (parallel: true)
+- [ ] #11 - 前端界面开发和集成 (parallel: true)
+- [ ] #2 - 项目环境搭建和基础配置 (parallel: true)
+- [ ] #3 - 用户认证和权限管理系统 (parallel: true)
+- [ ] #4 - 数据库集成和数据模型设计 (parallel: true)
+- [ ] #5 - 文件上传和处理系统 (parallel: true)
+- [ ] #6 - 项目信息管理系统 (parallel: true)
+- [ ] #7 - AI服务集成和配置 (parallel: true)
+- [ ] #8 - 简历优化规则引擎 (parallel: true)
+- [ ] #9 - 简历生成和导出系统 (parallel: true)
 
-Total tasks: 10
-Parallel tasks: 10
-Sequential tasks: 0
-Estimated total effort: 212 hours
+Total tasks:       10
+Parallel tasks:       10 (可以同时进行)
+Sequential tasks: 0 (有依赖关系)
