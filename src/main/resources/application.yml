@@ -37,9 +37,9 @@ logging:
 
 # OpenAI配置
 openai:
-  api-key: ${OPENAI_API_KEY:your-openai-api-key}
-  base-url: ${OPENAI_BASE_URL:https://api.openai.com}
-  model: ${OPENAI_MODEL:gpt-3.5-turbo}
+  api-key: ${DASHSCOPE_API_KEY}
+  base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  model: qwen-plus
 
 # 文件上传配置
 file:
