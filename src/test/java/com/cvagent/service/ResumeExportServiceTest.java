@@ -43,6 +43,9 @@ public class ResumeExportServiceTest {
         // 设置个人信息
         EnhancedResume.PersonalInfo personalInfo = new EnhancedResume.PersonalInfo();
         personalInfo.setFullName("张三");
+        personalInfo.setEmail("zhangsan@example.com");
+        personalInfo.setPhone("13800138000");
+        personalInfo.setLocation("北京");
         personalInfo.setAddress("北京市朝阳区");
         testResume.setPersonalInfo(personalInfo);
 

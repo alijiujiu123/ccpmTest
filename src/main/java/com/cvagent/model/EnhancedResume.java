@@ -430,7 +430,7 @@ public class EnhancedResume {
         this.certifications = new Certifications();
         this.languages = new Languages();
         this.interests = new Interests();
-        this.generatedBy = "MANUAL_OPTIMIZED";
+        this.generatedBy = "system";
         this.optimizationStatus = "DRAFT";
     }
 

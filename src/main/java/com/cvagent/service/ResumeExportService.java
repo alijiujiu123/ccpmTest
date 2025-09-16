@@ -398,4 +398,46 @@ public class ResumeExportService {
         run = paragraph.createRun();
         run.setText("项目经验内容...");
     }
+
+    /**
+     * 获取文件的内容类型
+     */
+    public String getContentType(String format) {
+        switch (format.toLowerCase()) {
+            case "pdf":
+                return "application/pdf";
+            case "doc":
+            case "docx":
+                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            case "html":
+                return "text/html";
+            default:
+                return "application/octet-stream";
+        }
+    }
+
+    /**
+     * 获取文件扩展名
+     */
+    public String getFileExtension(String format) {
+        switch (format.toLowerCase()) {
+            case "pdf":
+                return ".pdf";
+            case "doc":
+                return ".doc";
+            case "docx":
+                return ".docx";
+            case "html":
+                return ".html";
+            default:
+                return "";
+        }
+    }
+
+    /**
+     * 处理空数据
+     */
+    public String handleNullData(String data) {
+        return data != null ? data : "";
+    }
 }
