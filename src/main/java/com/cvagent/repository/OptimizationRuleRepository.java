@@ -34,6 +34,10 @@ public interface OptimizationRuleRepository extends MongoRepository<Optimization
     @Query(value = "{}", fields = "{ 'category': 1 }")
     List<OptimizationRule> findAllCategories();
 
+    // 查找所有规则ID
+    @Query(value = "{}", fields = "{ 'id': 1 }")
+    List<String> findAllRuleIds();
+
     // 激活或停用规则
     @Query("{ '_id': ?1 }")
     @Update("{ '$set': { 'isActive': ?0 } }")
