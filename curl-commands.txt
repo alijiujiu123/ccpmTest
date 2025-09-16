@@ -1,0 +1,58 @@
+# CV Agent API curl 命令集合
+
+# 1. 用户注册
+curl -X POST "http://localhost:8080/api/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser7",
+    "email": "testuser7@example.com",
+    "fullName": "测试用户7",
+    "password": "password123"
+  }'
+{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjciLCJpYXQiOjE3NTc5OTcyNzAsImV4cCI6MTc1ODA4MzY3MH0.vdHJq6B3CuTlOXjBPiEe0Io6WIn7ygNw6ABRMQj5leU","tokenType":"Bearer","user":{"id":"68c8e8d6d0041e3977182921","username":"testuser7","email":"testuser7@example.com","fullName":"测试用户7","roles":["USER"],"createdAt":"2025-09-16T12:34:30.602"},"expiresIn":"2025-09-17T12:34:30"}
+
+# 2. 用户登录
+curl -X POST "http://localhost:8080/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "password": "password123"
+  }'
+{"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1Nzk5NzMyNiwiZXhwIjoxNzU4MDgzNzI2fQ.5GOUkKOm9ZVKgjXyh9W4wygE6nrXGDi9v4wCb1x833o","tokenType":"Bearer","user":{"id":"68c8e0a461d10866cde46244","username":"testuser","email":"testuser@example.com","fullName":"测试用户","roles":["USER"],"createdAt":"2025-09-16T11:59:31.893"},"expiresIn":"2025-09-17T12:35:26"}%
+
+# 3. 获取当前用户信息（需要替换YOUR_TOKEN_HERE为实际token）
+ curl -X GET "http://localhost:8080/api/auth/me" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1Nzk5NzMyNiwiZXhwIjoxNzU4MDgzNzI2fQ.5GOUkKOm9ZVKgjXyh9W4wygE6nrXGDi9v4wCb1x833o"
+{"id":"68c8e0a461d10866cde46244","username":"testuser","email":"testuser@example.com","fullName":"测试用户","roles":["USER"],"createdAt":"2025-09-16T11:59:31.893"}%
+
+curl -X GET "http://localhost:8080/api/auth/me" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjciLCJpYXQiOjE3NTc5OTcyNzAsImV4cCI6MTc1ODA4MzY3MH0.vdHJq6B3CuTlOXjBPiEe0Io6WIn7ygNw6ABRMQj5leU"
+{"id":"68c8e8d6d0041e3977182921","username":"testuser7","email":"testuser7@example.com","fullName":"测试用户7","roles":["USER"],"createdAt":"2025-09-16T12:34:30.602"}
+
+# 4. 测试重复用户名注册（应该返回错误）
+curl -X POST "http://localhost:8080/api/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "email": "another@example.com",
+    "fullName": "另一个用户",
+    "password": "password123"
+  }'
+
+# 5. 测试无效登录（应该返回错误）
+curl -X POST "http://localhost:8080/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "nonexistent",
+    "password": "wrongpassword"
+  }'
+
+# 6. 测试无token访问用户信息（应该返回401）
+curl -X GET "http://localhost:8080/api/auth/me"
+
+# 使用说明：
+# 1. 确保Spring Boot应用已启动在localhost:8080端口
+# 2. 先运行注册命令创建用户
+# 3. 再运行登录命令获取token
+# 4. 将登录响应中的token替换到获取用户信息命令中
+# 5. 或直接运行api-curl.sh脚本进行自动化测试

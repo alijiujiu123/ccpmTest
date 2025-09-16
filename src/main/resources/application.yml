@@ -1,7 +1,7 @@
 server:
   port: 8080
-  servlet:
-    context-path: /api
+  #servlet:
+    #context-path: /api
 
 spring:
   application:
@@ -16,6 +16,11 @@ spring:
     type: caffeine
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=10m
+  # Spring Security配置
+  security:
+    user:
+      name: admin
+      password: admin
 
 logging:
   level:
@@ -37,3 +42,12 @@ file:
     allowed-types: application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document
   storage:
     path: ${FILE_STORAGE_PATH:./uploads}
+
+# JWT配置
+app:
+  jwt:
+    secret: mySecretKeyForCvAgentApplicationShouldBeVeryLongAndSecure
+    expiration-in-ms: 86400000 # 24小时
+
+
+
