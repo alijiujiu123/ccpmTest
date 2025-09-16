@@ -1,0 +1,39 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: cv-agent
+  
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/cvagent
+      database: cvagent
+  
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m
+
+logging:
+  level:
+    com.cvagent: INFO
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# OpenAI配置
+openai:
+  api-key: ${OPENAI_API_KEY:your-openai-api-key}
+  base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+  model: ${OPENAI_MODEL:gpt-3.5-turbo}
+
+# 文件上传配置
+file:
+  upload:
+    max-size: 10MB
+    allowed-types: application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document
+  storage:
+    path: ${FILE_STORAGE_PATH:./uploads}
