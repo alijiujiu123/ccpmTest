@@ -41,4 +41,7 @@ public interface ProjectRepository extends MongoRepository<Project, String> {
 
     // 删除简历的所有项目
     void deleteByResumeId(String resumeId);
+
+    // 根据简历ID列表查找项目
+    List<Project> findByResumeIdIn(List<String> resumeIds);
 }
