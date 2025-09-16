@@ -1,6 +1,8 @@
 package com.cvagent.controller;
 
 import com.cvagent.CvAgentApplication;
+import com.cvagent.dto.AuthRequest;
+import com.cvagent.dto.AuthResponse;
 import com.cvagent.dto.FileUploadResponse;
 import com.cvagent.model.FileDocument;
 import com.cvagent.model.User;
@@ -17,6 +19,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -48,25 +51,35 @@ class FileControllerTest {
     private User testUser;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         // 创建测试用户
-        testUser = new User();
-        testUser.setUsername("testuser");
-        testUser.setEmail("test@example.com");
-        testUser.setPassword("password123");
-        testUser = userRepository.save(testUser);
+//        testUser = new User();
+//        testUser.setUsername("testuser");
+//        testUser.setEmail("test@example.com");
+//        testUser.setPassword("password123");
+//        testUser = userRepository.save(testUser);
 
-        // 创建UserPrincipal
-        UserPrincipal userPrincipal = UserPrincipal.create(testUser);
+        // 使用真实的login方法获取token
+        AuthRequest loginRequest = new AuthRequest();
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("password123");
 
-        // 生成认证token
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            userPrincipal, null, userPrincipal.getAuthorities()
-        );
-        authToken = "Bearer " + jwtTokenProvider.generateToken(authentication);
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String loginResponse = loginResult.getResponse().getContentAsString();
+        AuthResponse authResponse = objectMapper.readValue(loginResponse, AuthResponse.class);
+        authToken = authResponse.getTokenType() + " " + authResponse.getToken();
 
         // 设置安全上下文
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        UserPrincipal userPrincipal = UserPrincipal.create(testUser);
+//        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+//            userPrincipal, null, userPrincipal.getAuthorities()
+//        );
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
