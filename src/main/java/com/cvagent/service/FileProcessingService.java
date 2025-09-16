@@ -53,20 +53,51 @@ public class FileProcessingService {
      * 提取PDF文本内容
      */
     private String extractPdfText(Path filePath) throws IOException {
-        // 这里应该集成PDF处理库，如Apache PDFBox
-        // 暂时返回占位符
-        logger.info("PDF文本提取功能待实现");
-        return "PDF内容提取功能待实现";
+        try {
+            // 使用Apache PDFBox提取PDF文本
+            org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(filePath.toFile());
+            org.apache.pdfbox.text.PDFTextStripper stripper = new org.apache.pdfbox.text.PDFTextStripper();
+            String text = stripper.getText(document);
+            document.close();
+
+            logger.info("PDF文本提取成功，文件长度: {}", text.length());
+            return text;
+        } catch (Exception e) {
+            logger.error("PDF文本提取失败: {}", filePath, e);
+            throw new IOException("PDF文本提取失败: " + e.getMessage());
+        }
     }
 
     /**
      * 提取Word文档文本内容
      */
     private String extractWordText(Path filePath, String contentType) throws IOException {
-        // 这里应该集成Word处理库，如Apache POI
-        // 暂时返回占位符
-        logger.info("Word文档文本提取功能待实现");
-        return "Word文档内容提取功能待实现";
+        try {
+            String text = "";
+
+            if (contentType.equals("application/msword")) {
+                // 处理 .doc 文件
+                // 注意：HWPFDocument在较新版本的POI中可能不被完全支持
+                // 这里暂时使用基础方法处理
+                logger.warn("DOC文件处理需要额外配置，暂时返回基础内容");
+                text = "DOC文件内容提取功能需要额外配置";
+            } else if (contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                // 处理 .docx 文件
+                org.apache.poi.xwpf.usermodel.XWPFDocument document = new org.apache.poi.xwpf.usermodel.XWPFDocument(
+                    new java.io.FileInputStream(filePath.toFile())
+                );
+                org.apache.poi.xwpf.extractor.XWPFWordExtractor extractor = new org.apache.poi.xwpf.extractor.XWPFWordExtractor(document);
+                text = extractor.getText();
+                extractor.close();
+                document.close();
+            }
+
+            logger.info("Word文档文本提取成功，文件长度: {}", text.length());
+            return text;
+        } catch (Exception e) {
+            logger.error("Word文档文本提取失败: {}", filePath, e);
+            throw new IOException("Word文档文本提取失败: " + e.getMessage());
+        }
     }
 
     /**
@@ -181,6 +212,180 @@ public class FileProcessingService {
                originalName.contains("resume") ||
                originalName.contains("简历") ||
                originalName.contains("cv");
+    }
+
+    /**
+     * 解析简历文件并提取结构化信息
+     */
+    public Map<String, Object> parseResume(FileDocument fileDocument) {
+        Map<String, Object> resumeData = new HashMap<>();
+
+        try {
+            String content = extractTextContent(fileDocument);
+
+            // 提取基本信息
+            resumeData.put("personalInfo", extractPersonalInfo(content));
+            resumeData.put("education", extractEducation(content));
+            resumeData.put("workExperience", extractWorkExperience(content));
+            resumeData.put("skills", extractSkills(content));
+            resumeData.put("projects", extractProjects(content));
+            resumeData.put("contactInfo", extractContactInfo(content));
+
+            logger.info("简历解析完成: {}", fileDocument.getId());
+            return resumeData;
+
+        } catch (Exception e) {
+            logger.error("简历解析失败: {}", fileDocument.getId(), e);
+            throw new RuntimeException("简历解析失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 提取个人信息
+     */
+    private Map<String, String> extractPersonalInfo(String content) {
+        Map<String, String> personalInfo = new HashMap<>();
+
+        // 简单的姓名提取（中文姓名）
+        java.util.regex.Pattern namePattern = java.util.regex.Pattern.compile(
+            "([\\u4e00-\\u9fa5]{2,4})\\s*(?:先生|女士|同学)"
+        );
+        java.util.regex.Matcher nameMatcher = namePattern.matcher(content);
+        if (nameMatcher.find()) {
+            personalInfo.put("name", nameMatcher.group(1));
+        }
+
+        // 年龄提取
+        java.util.regex.Pattern agePattern = java.util.regex.Pattern.compile(
+            "(\\d+)\\s*岁"
+        );
+        java.util.regex.Matcher ageMatcher = agePattern.matcher(content);
+        if (ageMatcher.find()) {
+            personalInfo.put("age", ageMatcher.group(1));
+        }
+
+        return personalInfo;
+    }
+
+    /**
+     * 提取教育背景
+     */
+    private java.util.List<Map<String, String>> extractEducation(String content) {
+        java.util.List<Map<String, String>> education = new java.util.ArrayList<>();
+
+        // 匹配教育背景
+        java.util.regex.Pattern eduPattern = java.util.regex.Pattern.compile(
+            "([\\u4e00-\\u9fa5\\w\\s]+?)\\s*(?:大学|学院|学校)\\s*([\\u4e00-\\u9fa5\\w\\s]+?)\\s*(\\d{4})\\s*[~-]\\s*(\\d{4}|至今)"
+        );
+        java.util.regex.Matcher eduMatcher = eduPattern.matcher(content);
+
+        while (eduMatcher.find()) {
+            Map<String, String> eduItem = new HashMap<>();
+            eduItem.put("school", eduMatcher.group(1) + eduMatcher.group(2));
+            eduItem.put("major", eduMatcher.group(1));
+            eduItem.put("startYear", eduMatcher.group(3));
+            eduItem.put("endYear", eduMatcher.group(4));
+            education.add(eduItem);
+        }
+
+        return education;
+    }
+
+    /**
+     * 提取工作经验
+     */
+    private java.util.List<Map<String, String>> extractWorkExperience(String content) {
+        java.util.List<Map<String, String>> experience = new java.util.ArrayList<>();
+
+        // 匹配工作经验
+        java.util.regex.Pattern expPattern = java.util.regex.Pattern.compile(
+            "([\\u4e00-\\u9fa5\\w\\s]+?)\\s*(?:公司|有限公司|科技)\\s*([\\u4e00-\\u9fa5\\w\\s]+?)\\s*(\\d{4})\\s*[~-]\\s*(\\d{4}|至今)"
+        );
+        java.util.regex.Matcher expMatcher = expPattern.matcher(content);
+
+        while (expMatcher.find()) {
+            Map<String, String> expItem = new HashMap<>();
+            expItem.put("company", expMatcher.group(1));
+            expItem.put("position", expMatcher.group(2));
+            expItem.put("startYear", expMatcher.group(3));
+            expItem.put("endYear", expMatcher.group(4));
+            experience.add(expItem);
+        }
+
+        return experience;
+    }
+
+    /**
+     * 提取技能
+     */
+    private java.util.List<String> extractSkills(String content) {
+        java.util.List<String> skills = new java.util.ArrayList<>();
+
+        // 常见技能关键词
+        String[] skillKeywords = {
+            "Java", "Python", "JavaScript", "React", "Vue", "Spring", "MySQL",
+            "MongoDB", "Docker", "Kubernetes", "Git", "Linux", "AWS", "微服务",
+            "机器学习", "深度学习", "数据分析", "项目管理", "团队协作"
+        };
+
+        for (String skill : skillKeywords) {
+            if (content.contains(skill)) {
+                skills.add(skill);
+            }
+        }
+
+        return skills;
+    }
+
+    /**
+     * 提取项目经验
+     */
+    private java.util.List<Map<String, String>> extractProjects(String content) {
+        java.util.List<Map<String, String>> projects = new java.util.ArrayList<>();
+
+        // 匹配项目经验
+        java.util.regex.Pattern projectPattern = java.util.regex.Pattern.compile(
+            "([\\u4e00-\\u9fa5\\w\\s]+?)\\s*(?:项目|系统)\\s*([\\u4e00-\\u9fa5\\w\\s]+?)\\s*(\\d{4})\\s*[~-]\\s*(\\d{4}|至今)"
+        );
+        java.util.regex.Matcher projectMatcher = projectPattern.matcher(content);
+
+        while (projectMatcher.find()) {
+            Map<String, String> projectItem = new HashMap<>();
+            projectItem.put("name", projectMatcher.group(1));
+            projectItem.put("description", projectMatcher.group(2));
+            projectItem.put("startYear", projectMatcher.group(3));
+            projectItem.put("endYear", projectMatcher.group(4));
+            projects.add(projectItem);
+        }
+
+        return projects;
+    }
+
+    /**
+     * 提取联系信息
+     */
+    private Map<String, String> extractContactInfo(String content) {
+        Map<String, String> contactInfo = new HashMap<>();
+
+        // 邮箱提取
+        java.util.regex.Pattern emailPattern = java.util.regex.Pattern.compile(
+            "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+        );
+        java.util.regex.Matcher emailMatcher = emailPattern.matcher(content);
+        if (emailMatcher.find()) {
+            contactInfo.put("email", emailMatcher.group());
+        }
+
+        // 电话提取
+        java.util.regex.Pattern phonePattern = java.util.regex.Pattern.compile(
+            "(?:1[3-9]\\d{9}|0\\d{2,3}-?\\d{7,8})"
+        );
+        java.util.regex.Matcher phoneMatcher = phonePattern.matcher(content);
+        if (phoneMatcher.find()) {
+            contactInfo.put("phone", phoneMatcher.group());
+        }
+
+        return contactInfo;
     }
 
     /**

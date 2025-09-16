@@ -7,6 +7,7 @@ import com.cvagent.repository.FileDocumentRepository;
 import com.cvagent.repository.UserRepository;
 import com.cvagent.security.UserPrincipal;
 import com.cvagent.service.FileService;
+import com.cvagent.service.FileProcessingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/files")
@@ -34,6 +37,9 @@ public class FileController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FileProcessingService fileProcessingService;
 
     /**
      * 上传文件
@@ -159,6 +165,72 @@ public class FileController {
 
         logger.info("用户 {} 查询文件信息: {}", user.getUsername(), fileId);
         return ResponseEntity.ok(fileDocument);
+    }
+
+    /**
+     * 解析简历文件
+     */
+    @PostMapping("/{fileId}/parse-resume")
+    public ResponseEntity<Map<String, Object>> parseResume(
+            @PathVariable String fileId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        FileDocument fileDocument = fileService.getFileById(fileId, user);
+
+        // 检查是否为简历文件
+        if (!fileProcessingService.isResumeFile(fileDocument)) {
+            throw new RuntimeException("该文件不是简历文件，无法解析");
+        }
+
+        // 解析简历
+        Map<String, Object> resumeData = fileProcessingService.parseResume(fileDocument);
+
+        logger.info("用户 {} 解析简历文件: {}", user.getUsername(), fileId);
+        return ResponseEntity.ok(resumeData);
+    }
+
+    /**
+     * 提取文件文本内容
+     */
+    @GetMapping("/{fileId}/text-content")
+    public ResponseEntity<Map<String, String>> extractTextContent(
+            @PathVariable String fileId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        FileDocument fileDocument = fileService.getFileById(fileId, user);
+
+        // 提取文本内容
+        String textContent = fileProcessingService.extractTextContent(fileDocument);
+        Map<String, String> response = new HashMap<>();
+        response.put("content", textContent);
+        response.put("fileId", fileId);
+        response.put("fileName", fileDocument.getOriginalName());
+
+        logger.info("用户 {} 提取文件文本内容: {}", user.getUsername(), fileId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 获取文件元数据
+     */
+    @GetMapping("/{fileId}/metadata")
+    public ResponseEntity<Map<String, Object>> getFileMetadata(
+            @PathVariable String fileId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        FileDocument fileDocument = fileService.getFileById(fileId, user);
+
+        // 获取文件元数据
+        Map<String, Object> metadata = fileProcessingService.getFileMetadata(fileDocument);
+
+        logger.info("用户 {} 获取文件元数据: {}", user.getUsername(), fileId);
+        return ResponseEntity.ok(metadata);
     }
 
     /**
