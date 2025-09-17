@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ public class AiController {
      */
     @PostMapping("/chat")
     @Operation(summary = "AI聊天", description = "基础AI聊天功能")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "聊天成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),
@@ -86,6 +88,7 @@ public class AiController {
      */
     @PostMapping("/optimize-resume")
     @Operation(summary = "简历优化", description = "使用AI优化简历内容")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "优化成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),
@@ -123,6 +126,7 @@ public class AiController {
      */
     @PostMapping("/generate-cover-letter")
     @Operation(summary = "生成求职信", description = "使用AI生成求职信")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "生成成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),
@@ -165,6 +169,7 @@ public class AiController {
      */
     @PostMapping("/improve-resume-section")
     @Operation(summary = "改进简历章节", description = "使用AI改进简历的特定章节")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "改进成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),
@@ -207,6 +212,7 @@ public class AiController {
      */
     @PostMapping("/generate-project-description")
     @Operation(summary = "生成项目描述", description = "使用AI生成项目描述")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "生成成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),
@@ -243,6 +249,7 @@ public class AiController {
      */
     @PostMapping("/chat-async")
     @Operation(summary = "异步聊天", description = "异步AI聊天功能")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "聊天成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),
@@ -283,6 +290,7 @@ public class AiController {
      */
     @PostMapping("/batch-process")
     @Operation(summary = "批量处理", description = "批量处理AI请求")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "处理成功"),
         @ApiResponse(responseCode = "400", description = "请求参数错误"),

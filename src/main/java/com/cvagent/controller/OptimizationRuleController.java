@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import java.util.Set;
 @RequestMapping("/api/rules")
 @CrossOrigin(origins = "*")
 @Tag(name = "优化规则管理", description = "简历优化规则的CRUD操作和管理功能接口")
+@SecurityRequirement(name = "bearerAuth")
 public class OptimizationRuleController {
 
     private static final Logger logger = LoggerFactory.getLogger(OptimizationRuleController.class);

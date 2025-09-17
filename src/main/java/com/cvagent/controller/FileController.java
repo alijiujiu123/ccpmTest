@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/api/files")
 @Tag(name = "文件管理", description = "文件上传、下载、预览和处理相关接口")
+@SecurityRequirement(name = "bearerAuth")
 public class FileController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import java.util.Map;
 @RequestMapping("/api/cover-letters")
 @CrossOrigin(origins = "*")
 @Tag(name = "求职信管理", description = "求职信的生成、管理、优化和导出相关接口")
+@SecurityRequirement(name = "bearerAuth")
 public class CoverLetterController {
 
     @Autowired
