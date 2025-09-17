@@ -6,6 +6,11 @@ import com.cvagent.security.UserPrincipal;
 import com.cvagent.service.AiMonitoringService;
 import com.cvagent.service.AiServiceManager;
 import com.cvagent.service.PromptTemplateService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @RestController
 @RequestMapping("/api/ai")
+@Tag(name = "AI服务", description = "AI相关功能的服务接口")
 public class AiController {
 
     private static final Logger logger = LoggerFactory.getLogger(AiController.class);
@@ -44,8 +50,16 @@ public class AiController {
      * 基础聊天功能
      */
     @PostMapping("/chat")
+    @Operation(summary = "AI聊天", description = "基础AI聊天功能")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "聊天成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public ResponseEntity<Map<String, Object>> chat(
+            @Parameter(description = "聊天请求参数", required = true)
             @RequestBody Map<String, String> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起聊天请求", userPrincipal.getUsername());
@@ -71,8 +85,16 @@ public class AiController {
      * 简历优化
      */
     @PostMapping("/optimize-resume")
+    @Operation(summary = "简历优化", description = "使用AI优化简历内容")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "优化成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public ResponseEntity<Map<String, Object>> optimizeResume(
+            @Parameter(description = "简历优化请求参数", required = true)
             @RequestBody Map<String, String> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起简历优化请求", userPrincipal.getUsername());
@@ -100,8 +122,16 @@ public class AiController {
      * 生成求职信
      */
     @PostMapping("/generate-cover-letter")
+    @Operation(summary = "生成求职信", description = "使用AI生成求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "生成成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public ResponseEntity<Map<String, Object>> generateCoverLetter(
+            @Parameter(description = "求职信生成请求参数", required = true)
             @RequestBody Map<String, String> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起求职信生成请求", userPrincipal.getUsername());
@@ -134,8 +164,16 @@ public class AiController {
      * 改进简历章节
      */
     @PostMapping("/improve-resume-section")
+    @Operation(summary = "改进简历章节", description = "使用AI改进简历的特定章节")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "改进成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public ResponseEntity<Map<String, Object>> improveResumeSection(
+            @Parameter(description = "章节改进请求参数", required = true)
             @RequestBody Map<String, String> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起简历章节改进请求", userPrincipal.getUsername());
@@ -168,8 +206,16 @@ public class AiController {
      * 生成项目描述
      */
     @PostMapping("/generate-project-description")
+    @Operation(summary = "生成项目描述", description = "使用AI生成项目描述")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "生成成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public ResponseEntity<Map<String, Object>> generateProjectDescription(
+            @Parameter(description = "项目描述生成请求参数", required = true)
             @RequestBody Map<String, String> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起项目描述生成请求", userPrincipal.getUsername());
@@ -196,8 +242,16 @@ public class AiController {
      * 异步聊天
      */
     @PostMapping("/chat-async")
+    @Operation(summary = "异步聊天", description = "异步AI聊天功能")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "聊天成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public CompletableFuture<ResponseEntity<Map<String, Object>>> chatAsync(
+            @Parameter(description = "聊天请求参数", required = true)
             @RequestBody Map<String, String> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起异步聊天请求", userPrincipal.getUsername());
@@ -228,8 +282,16 @@ public class AiController {
      * 批量处理
      */
     @PostMapping("/batch-process")
+    @Operation(summary = "批量处理", description = "批量处理AI请求")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "处理成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "500", description = "AI服务暂时不可用")
+    })
     public ResponseEntity<Map<String, Object>> batchProcess(
+            @Parameter(description = "批量处理请求参数", required = true)
             @RequestBody Map<String, Object> request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 发起批量处理请求", userPrincipal.getUsername());
@@ -258,6 +320,10 @@ public class AiController {
      * 获取AI服务状态
      */
     @GetMapping("/status")
+    @Operation(summary = "获取服务状态", description = "获取AI服务的状态信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Map<String, Object>> getServiceStatus() {
         Map<String, Object> status = aiServiceManager.getServiceStatus();
         status.put("timestamp", System.currentTimeMillis());
@@ -268,6 +334,10 @@ public class AiController {
      * 获取服务统计信息
      */
     @GetMapping("/statistics")
+    @Operation(summary = "获取统计信息", description = "获取AI服务的统计信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Map<String, Object>> getStatistics() {
         Map<String, Object> statistics = aiMonitoringService.getServiceStatistics();
         return ResponseEntity.ok(statistics);
@@ -277,6 +347,10 @@ public class AiController {
      * 获取健康状态
      */
     @GetMapping("/health")
+    @Operation(summary = "获取健康状态", description = "获取AI服务的健康状态")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Map<String, Object>> getHealth() {
         Map<String, Object> health = aiMonitoringService.getHealthStatus();
         return ResponseEntity.ok(health);
@@ -286,6 +360,10 @@ public class AiController {
      * 获取性能报告
      */
     @GetMapping("/performance-report")
+    @Operation(summary = "获取性能报告", description = "获取AI服务的性能报告")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Map<String, Object>> getPerformanceReport() {
         Map<String, Object> report = aiMonitoringService.getPerformanceReport();
         return ResponseEntity.ok(report);
@@ -295,7 +373,12 @@ public class AiController {
      * 获取最近的使用日志
      */
     @GetMapping("/recent-logs")
+    @Operation(summary = "获取最近日志", description = "获取最近的AI使用日志")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<com.cvagent.model.AiUsageLog>> getRecentLogs(
+            @Parameter(description = "日志数量限制", required = false, example = "10")
             @RequestParam(defaultValue = "10") int limit) {
 
         if (limit > 100) {
@@ -310,7 +393,12 @@ public class AiController {
      * 获取错误日志
      */
     @GetMapping("/error-logs")
+    @Operation(summary = "获取错误日志", description = "获取AI服务的错误日志")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<com.cvagent.model.AiUsageLog>> getErrorLogs(
+            @Parameter(description = "日志数量限制", required = false, example = "10")
             @RequestParam(defaultValue = "10") int limit) {
 
         if (limit > 100) {
@@ -325,6 +413,10 @@ public class AiController {
      * 获取服务排行榜
      */
     @GetMapping("/service-ranking")
+    @Operation(summary = "获取服务排行榜", description = "获取AI服务的使用排行榜")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<Map<String, Object>>> getServiceRanking() {
         List<Map<String, Object>> ranking = aiMonitoringService.getServiceRanking();
         return ResponseEntity.ok(ranking);
@@ -334,6 +426,10 @@ public class AiController {
      * 获取所有提示词模板
      */
     @GetMapping("/prompt-templates")
+    @Operation(summary = "获取提示词模板", description = "获取所有的提示词模板名称")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<String>> getPromptTemplates() {
         List<String> templates = promptTemplateService.getAllTemplateNames();
         return ResponseEntity.ok(templates);
@@ -343,7 +439,13 @@ public class AiController {
      * 获取提示词模板详情
      */
     @GetMapping("/prompt-templates/{templateName}")
+    @Operation(summary = "获取模板详情", description = "获取指定提示词模板的详细信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "404", description = "模板不存在")
+    })
     public ResponseEntity<Map<String, Object>> getPromptTemplateDetails(
+            @Parameter(description = "模板名称", required = true, example = "resume_optimization")
             @PathVariable String templateName) {
 
         Map<String, Object> details = promptTemplateService.getTemplateDetails(templateName);
@@ -358,8 +460,16 @@ public class AiController {
      * 使用提示词模板
      */
     @PostMapping("/prompt-templates/{templateName}/use")
+    @Operation(summary = "使用模板", description = "使用指定的提示词模板")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "使用成功"),
+        @ApiResponse(responseCode = "404", description = "模板不存在"),
+        @ApiResponse(responseCode = "500", description = "处理模板失败")
+    })
     public ResponseEntity<Map<String, Object>> usePromptTemplate(
+            @Parameter(description = "模板名称", required = true, example = "resume_optimization")
             @PathVariable String templateName,
+            @Parameter(description = "模板变量", required = true)
             @RequestBody Map<String, Object> variables) {
 
         try {
@@ -378,6 +488,10 @@ public class AiController {
      * 重置统计数据
      */
     @PostMapping("/reset-statistics")
+    @Operation(summary = "重置统计", description = "重置AI服务的统计数据")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "重置成功")
+    })
     public ResponseEntity<Map<String, String>> resetStatistics() {
         aiMonitoringService.resetStatistics();
         return ResponseEntity.ok(Map.of("message", "统计数据已重置"));
@@ -387,7 +501,12 @@ public class AiController {
      * 清理旧日志
      */
     @PostMapping("/cleanup-logs")
+    @Operation(summary = "清理日志", description = "清理指定天数前的旧日志")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "清理成功")
+    })
     public ResponseEntity<Map<String, String>> cleanupLogs(
+            @Parameter(description = "保留天数", required = false, example = "30")
             @RequestParam(defaultValue = "30") int daysToKeep) {
 
         aiMonitoringService.cleanupOldLogs(daysToKeep);
