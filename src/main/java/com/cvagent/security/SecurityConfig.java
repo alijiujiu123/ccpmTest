@@ -39,6 +39,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/api/actuator/**").permitAll()
+                .requestMatchers("/api/ai/status", "/api/ai/health").permitAll()
+                .requestMatchers("/api/ai/statistics", "/api/ai/performance-report").permitAll()
+                .requestMatchers("/api/ai/service-ranking", "/api/ai/recent-logs").permitAll()
+                .requestMatchers("/api/ai/error-logs", "/api/ai/prompt-templates/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,10 +1,20 @@
 package com.cvagent.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "通用API响应格式", title = "API响应")
 public class ApiResponse<T> {
 
+    @Schema(description = "请求是否成功", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean success;
+
+    @Schema(description = "响应数据", anyOf = {Object.class, String.class, Integer.class, Boolean.class})
     private T data;
+
+    @Schema(description = "成功消息", example = "操作成功")
     private String message;
+
+    @Schema(description = "错误信息", example = "参数错误")
     private String error;
 
     // 成功响应构造函数

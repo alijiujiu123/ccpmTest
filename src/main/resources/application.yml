@@ -55,5 +55,53 @@ app:
     secret: mySecretKeyForCvAgentApplicationShouldBeVeryLongAndSecure
     expiration-in-ms: 86400000 # 24小时
 
+# Swagger配置
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    doc-expansion: none
+    filter: true
+    display-request-duration: true
+    try-it-out-enabled: true
+    supported-submit-methods: [get, post, put, delete, patch]
+  info:
+    title: CV Agent API 接口文档
+    description: |
+      AI驱动的简历优化工具API文档系统
+
+      ## 功能特点
+      - **简历管理**: 简历的创建、编辑、分析和优化
+      - **AI服务**: 智能简历分析、优化建议和求职信生成
+      - **项目管理**: 项目经历的组织和管理
+      - **文件处理**: 支持多种格式的简历文件上传和处理
+      - **用户认证**: JWT token认证机制
+
+      ## 使用说明
+      1. 访问 `/api-docs` 获取OpenAPI 3.0规范的JSON文档
+      2. 访问 `/swagger-ui.html` 使用交互式API测试界面
+      3. 需要认证的接口请在请求头中添加 `Authorization: Bearer <token>`
+    version: 1.0.0
+    contact:
+      name: CV Agent 开发团队
+      email: support@cvagent.com
+      url: https://github.com/alijiujiu123/ccpmTest
+    license:
+      name: MIT License
+      url: https://opensource.org/licenses/MIT
+  servers:
+    - url: http://localhost:8080
+      description: 本地开发服务器
+    - url: https://api.cvagent.com
+      description: 生产环境服务器
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  show-actuator: false
+
 
 
