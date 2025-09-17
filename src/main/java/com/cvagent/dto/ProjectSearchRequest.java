@@ -1,17 +1,32 @@
 package com.cvagent.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+@Schema(description = "项目搜索请求", title = "项目搜索")
 public class ProjectSearchRequest {
 
+    @Schema(description = "搜索关键词", example = "电商")
     private String query;
+
+    @Schema(description = "项目状态", example = "planning")
     private String status;
+
+    @Schema(description = "项目标签列表")
     private List<String> tags;
+
+    @Schema(description = "排序字段", example = "updatedAt", defaultValue = "updatedAt")
     private String sortBy = "updatedAt";
+
+    @Schema(description = "排序方向", example = "desc", defaultValue = "desc")
     private String sortOrder = "desc";
+
+    @Schema(description = "页码", example = "1", defaultValue = "1")
     private int page = 1;
+
+    @Schema(description = "每页大小", example = "10", defaultValue = "10")
     private int size = 10;
 
     // Getters and Setters

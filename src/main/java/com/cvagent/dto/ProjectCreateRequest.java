@@ -1,51 +1,77 @@
 package com.cvagent.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Schema(description = "项目创建请求", title = "项目创建")
 public class ProjectCreateRequest {
 
     @NotBlank(message = "项目名称不能为空")
+    @Schema(description = "项目名称", example = "电商网站开发", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
+    @Schema(description = "项目描述", example = "一个现代化的电商平台")
     private String description;
+
+    @Schema(description = "项目概述", example = "基于Spring Boot和Vue的电商系统")
     private String overview;
+
+    @Schema(description = "技术栈", example = "Java, Spring Boot, Vue, MySQL")
     private String technologyStack;
+
+    @Schema(description = "职责描述", example = "负责后端API开发")
     private String responsibilities;
+
+    @Schema(description = "成就列表")
     private List<String> achievements;
 
-    // Markdown格式的详细描述
+    @Schema(description = "Markdown格式的详细描述", example = "# 项目详情\n## 功能特点\n- 用户管理\n- 商品管理\n- 订单处理")
     private String markdownContent;
 
-    // 项目标签
+    @Schema(description = "项目标签")
     private List<String> tags;
 
-    // 项目链接和资源
+    @Schema(description = "项目链接", example = "https://example.com/project")
     private String projectUrl;
+
+    @Schema(description = "代码仓库链接", example = "https://github.com/user/project")
     private String repositoryUrl;
+
+    @Schema(description = "演示链接", example = "https://demo.example.com")
     private String demoUrl;
 
-    // 团队信息
+    @Schema(description = "团队规模", example = "5人")
     private String teamSize;
+
+    @Schema(description = "团队角色", example = "技术负责人")
     private String teamRole;
 
-    // 项目状态和优先级
+    @Schema(description = "项目状态", example = "planning", defaultValue = "planning")
     private String status = "planning";
+
+    @Schema(description = "项目优先级", example = "3", defaultValue = "3")
     private Integer priority = 3;
 
-    // 项目可见性
+    @Schema(description = "是否公开", example = "false", defaultValue = "false")
     private Boolean isPublic = false;
 
-    // 版本信息
+    @Schema(description = "版本信息", example = "1.0", defaultValue = "1.0")
     private String version = "1.0";
 
+    @Schema(description = "开始时间", example = "2025-01-01T00:00:00")
     private LocalDateTime startDate;
+
+    @Schema(description = "结束时间", example = "2025-06-01T00:00:00")
     private LocalDateTime endDate;
+
+    @Schema(description = "是否进行中", example = "false", defaultValue = "false")
     private Boolean isOngoing = false;
 
     @NotNull(message = "所属简历ID不能为空")
+    @Schema(description = "所属简历ID", example = "resume_123456", requiredMode = Schema.RequiredMode.REQUIRED)
     private String resumeId;
 
     // Getters and Setters
