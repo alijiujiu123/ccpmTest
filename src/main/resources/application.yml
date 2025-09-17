@@ -55,5 +55,28 @@ app:
     secret: mySecretKeyForCvAgentApplicationShouldBeVeryLongAndSecure
     expiration-in-ms: 86400000 # 24小时
 
+# Swagger配置
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+  info:
+    title: CV Agent API
+    description: AI驱动的简历优化工具API文档
+    version: 1.0.0
+    contact:
+      name: CV Agent Team
+      email: support@cvagent.com
+  servers:
+    - url: http://localhost:8080
+      description: 本地开发服务器
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
 
 
