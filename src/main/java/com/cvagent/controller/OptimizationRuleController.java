@@ -2,6 +2,11 @@ package com.cvagent.controller;
 
 import com.cvagent.model.OptimizationRule;
 import com.cvagent.service.RuleEngineService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +31,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/rules")
 @CrossOrigin(origins = "*")
+@Tag(name = "优化规则管理", description = "简历优化规则的CRUD操作和管理功能接口")
 public class OptimizationRuleController {
 
     private static final Logger logger = LoggerFactory.getLogger(OptimizationRuleController.class);
@@ -38,8 +44,17 @@ public class OptimizationRuleController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<OptimizationRule> createRule(@RequestBody OptimizationRule rule,
-                                                    @AuthenticationPrincipal Object userPrincipal) {
+    @Operation(summary = "创建规则", description = "创建新的优化规则（需要管理员权限）")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "创建成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "403", description = "权限不足")
+    })
+    public ResponseEntity<OptimizationRule> createRule(
+            @Parameter(description = "优化规则数据", required = true)
+            @RequestBody OptimizationRule rule,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal Object userPrincipal) {
         logger.info("用户 {} 创建新规则: {}", userPrincipal, rule.getName());
 
         try {
@@ -56,9 +71,20 @@ public class OptimizationRuleController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<OptimizationRule> updateRule(@PathVariable String id,
-                                                    @RequestBody OptimizationRule ruleDetails,
-                                                    @AuthenticationPrincipal Object userPrincipal) {
+    @Operation(summary = "更新规则", description = "更新指定的优化规则（需要管理员权限）")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "规则不存在"),
+        @ApiResponse(responseCode = "403", description = "权限不足")
+    })
+    public ResponseEntity<OptimizationRule> updateRule(
+            @Parameter(description = "规则ID", required = true, example = "rule123")
+            @PathVariable String id,
+            @Parameter(description = "规则更新数据", required = true)
+            @RequestBody OptimizationRule ruleDetails,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal Object userPrincipal) {
         logger.info("用户 {} 更新规则: {}", userPrincipal, id);
 
         try {
@@ -75,8 +101,17 @@ public class OptimizationRuleController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteRule(@PathVariable String id,
-                                          @AuthenticationPrincipal Object userPrincipal) {
+    @Operation(summary = "删除规则", description = "删除指定的优化规则（需要管理员权限）")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "删除成功"),
+        @ApiResponse(responseCode = "404", description = "规则不存在"),
+        @ApiResponse(responseCode = "403", description = "权限不足")
+    })
+    public ResponseEntity<Void> deleteRule(
+            @Parameter(description = "规则ID", required = true, example = "rule123")
+            @PathVariable String id,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal Object userPrincipal) {
         logger.info("用户 {} 删除规则: {}", userPrincipal, id);
 
         try {
@@ -93,9 +128,19 @@ public class OptimizationRuleController {
      */
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> toggleRuleStatus(@PathVariable String id,
-                                              @RequestParam boolean isActive,
-                                              @AuthenticationPrincipal Object userPrincipal) {
+    @Operation(summary = "切换规则状态", description = "激活或停用指定的优化规则（需要管理员权限）")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "状态切换成功"),
+        @ApiResponse(responseCode = "404", description = "规则不存在"),
+        @ApiResponse(responseCode = "403", description = "权限不足")
+    })
+    public ResponseEntity<Void> toggleRuleStatus(
+            @Parameter(description = "规则ID", required = true, example = "rule123")
+            @PathVariable String id,
+            @Parameter(description = "是否激活", required = true, example = "true")
+            @RequestParam boolean isActive,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal Object userPrincipal) {
         logger.info("用户 {} 切换规则状态: {} -> {}", userPrincipal, id, isActive);
 
         try {
@@ -111,6 +156,10 @@ public class OptimizationRuleController {
      * 获取所有规则
      */
     @GetMapping
+    @Operation(summary = "获取所有规则", description = "获取所有的优化规则列表")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<OptimizationRule>> getAllRules() {
         logger.info("获取所有规则");
 
@@ -127,9 +176,16 @@ public class OptimizationRuleController {
      * 分页获取规则
      */
     @GetMapping("/page")
+    @Operation(summary = "分页获取规则", description = "分页获取优化规则列表")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Page<OptimizationRule>> getRulesByPage(
+            @Parameter(description = "页码", required = false, example = "0")
             @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "页面大小", required = false, example = "10")
             @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "排序方式", required = false, example = "priority,desc")
             @RequestParam(defaultValue = "priority,desc") String sort) {
 
         logger.info("分页获取规则: page={}, size={}, sort={}", page, size, sort);
@@ -158,6 +214,10 @@ public class OptimizationRuleController {
      * 获取活跃规则
      */
     @GetMapping("/active")
+    @Operation(summary = "获取活跃规则", description = "获取所有活跃的优化规则")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<OptimizationRule>> getActiveRules() {
         logger.info("获取活跃规则");
 
@@ -174,7 +234,13 @@ public class OptimizationRuleController {
      * 按类别获取规则
      */
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<OptimizationRule>> getRulesByCategory(@PathVariable String category) {
+    @Operation(summary = "按类别获取规则", description = "获取指定类别的优化规则")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
+    public ResponseEntity<List<OptimizationRule>> getRulesByCategory(
+            @Parameter(description = "规则类别", required = true, example = "格式优化")
+            @PathVariable String category) {
         logger.info("按类别获取规则: {}", category);
 
         try {
@@ -190,7 +256,13 @@ public class OptimizationRuleController {
      * 搜索规则
      */
     @GetMapping("/search")
-    public ResponseEntity<List<OptimizationRule>> searchRules(@RequestParam String keyword) {
+    @Operation(summary = "搜索规则", description = "根据关键词搜索优化规则")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "搜索成功")
+    })
+    public ResponseEntity<List<OptimizationRule>> searchRules(
+            @Parameter(description = "搜索关键词", required = true, example = "格式")
+            @RequestParam String keyword) {
         logger.info("搜索规则: {}", keyword);
 
         try {
@@ -206,6 +278,10 @@ public class OptimizationRuleController {
      * 获取所有规则类别
      */
     @GetMapping("/categories")
+    @Operation(summary = "获取规则类别", description = "获取所有的规则类别")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Set<String>> getAllCategories() {
         logger.info("获取所有规则类别");
 
@@ -222,7 +298,14 @@ public class OptimizationRuleController {
      * 应用规则到简历内容
      */
     @PostMapping("/apply")
-    public ResponseEntity<Map<String, Object>> applyRules(@RequestBody Map<String, String> request) {
+    @Operation(summary = "应用规则", description = "将优化规则应用到简历内容")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "应用成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<Map<String, Object>> applyRules(
+            @Parameter(description = "规则应用请求参数", required = true)
+            @RequestBody Map<String, String> request) {
         logger.info("应用规则到简历内容");
 
         try {
@@ -251,7 +334,13 @@ public class OptimizationRuleController {
      * 批量应用规则
      */
     @PostMapping("/batch-apply")
+    @Operation(summary = "批量应用规则", description = "批量将优化规则应用到简历内容")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "应用成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
     public ResponseEntity<RuleEngineService.BatchOptimizationResult> batchApplyRules(
+            @Parameter(description = "批量应用请求参数", required = true)
             @RequestBody Map<String, String> request) {
 
         logger.info("批量应用规则");
@@ -277,6 +366,10 @@ public class OptimizationRuleController {
      * 获取规则统计信息
      */
     @GetMapping("/statistics")
+    @Operation(summary = "获取统计信息", description = "获取优化规则的统计信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<Map<String, Object>> getStatistics() {
         logger.info("获取规则统计信息");
 
