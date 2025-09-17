@@ -1,11 +1,13 @@
 package com.cvagent.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,23 +16,30 @@ import java.util.Collection;
 import java.util.List;
 
 @Document(collection = "users")
+@Schema(description = "用户实体", title = "用户")
+@JsonIgnoreProperties({"password", "authorities", "accountNonExpired", "accountNonLocked", "credentialsNonExpired", "enabled"})
 public class User implements UserDetails {
     
     @Id
+    @Schema(description = "用户ID", example = "507f1f77bcf86cd799439011")
     private String id;
     
     @NotBlank(message = "用户名不能为空")
     @Size(min = 3, max = 50, message = "用户名长度必须在3-50个字符之间")
+    @Schema(description = "用户名", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
     
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
+    @Schema(description = "邮箱地址", example = "admin@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
     
     @NotBlank(message = "密码不能为空")
     @Size(min = 6, message = "密码长度至少6个字符")
+    @Schema(description = "密码", example = "password123", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
     
+    @Schema(description = "全名", example = "张三")
     private String fullName;
     
     private boolean enabled = true;
@@ -38,9 +47,13 @@ public class User implements UserDetails {
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     
+    @Schema(description = "用户角色列表", example = "[\"USER\"]")
     private List<String> roles = List.of("USER");
     
+    @Schema(description = "创建时间")
     private LocalDateTime createdAt;
+
+    @Schema(description = "更新时间")
     private LocalDateTime updatedAt;
     
     // 构造函数

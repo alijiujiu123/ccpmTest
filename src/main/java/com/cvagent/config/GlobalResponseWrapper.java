@@ -23,6 +23,12 @@ public class GlobalResponseWrapper implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        // 检查是否是API文档路径，如果是则不包装
+        String path = request.getURI().getPath();
+        if (path != null && (path.contains("/v3/api-docs") || path.contains("/swagger-ui"))) {
+            return body;
+        }
+
         // 如果返回的是ResponseEntity，提取其中的body
         if (body instanceof ResponseEntity) {
             ResponseEntity<?> responseEntity = (ResponseEntity<?>) body;

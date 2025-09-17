@@ -1,6 +1,5 @@
 package com.cvagent.controller;
 
-import com.cvagent.dto.ApiResponse;
 import com.cvagent.dto.AuthRequest;
 import com.cvagent.dto.AuthResponse;
 import com.cvagent.dto.RegisterRequest;
@@ -33,11 +32,11 @@ public class AuthController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "请求参数错误"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "认证失败")
     })
-    public ResponseEntity<ApiResponse<AuthResponse>> authenticateUser(
+    public ResponseEntity<AuthResponse> authenticateUser(
             @Parameter(description = "登录请求参数", required = true)
             @Valid @RequestBody AuthRequest authRequest) {
         AuthResponse authResponse = authService.authenticateUser(authRequest);
-        return ResponseEntity.ok(ApiResponse.success(authResponse, "登录成功"));
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/register")
@@ -47,11 +46,11 @@ public class AuthController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "请求参数错误"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "用户名已存在")
     })
-    public ResponseEntity<ApiResponse<AuthResponse>> registerUser(
+    public ResponseEntity<AuthResponse> registerUser(
             @Parameter(description = "注册请求参数", required = true)
             @Valid @RequestBody RegisterRequest registerRequest) {
         AuthResponse authResponse = authService.registerUser(registerRequest);
-        return ResponseEntity.ok(ApiResponse.success(authResponse, "注册成功"));
+        return ResponseEntity.ok(authResponse);
     }
 
     @GetMapping("/me")
@@ -61,8 +60,8 @@ public class AuthController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "获取成功"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "未登录或token已过期")
     })
-    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser() {
+    public ResponseEntity<UserDto> getCurrentUser() {
         UserDto userDto = authService.getCurrentUser();
-        return ResponseEntity.ok(ApiResponse.success(userDto));
+        return ResponseEntity.ok(userDto);
     }
 }
