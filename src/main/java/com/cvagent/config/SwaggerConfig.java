@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,9 +52,29 @@ public class SwaggerConfig {
                 .url("http://localhost:" + serverPort)
                 .description("本地开发服务器");
 
+        // 定义API分组标签
+        Tag[] tags = new Tag[] {
+                new Tag().name("认证管理").description("用户登录、注册和认证相关接口"),
+                new Tag().name("简历管理").description("简历的创建、查询、更新和删除相关接口"),
+                new Tag().name("增强简历管理").description("增强简历的生成、导出、预览等功能接口"),
+                new Tag().name("项目管理").description("项目的创建、查询、更新和删除相关接口"),
+                new Tag().name("求职信管理").description("求职信的生成、管理、优化和导出相关接口"),
+                new Tag().name("文件管理").description("文件上传、下载、预览和处理相关接口"),
+                new Tag().name("优化规则管理").description("简历优化规则的CRUD操作和管理功能接口"),
+                new Tag().name("AI服务").description("AI相关功能的服务接口")
+        };
+
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
                 .info(info)
-                .addServersItem(server);
+                .addServersItem(server)
+                .addTagsItem(tags[0])
+                .addTagsItem(tags[1])
+                .addTagsItem(tags[2])
+                .addTagsItem(tags[3])
+                .addTagsItem(tags[4])
+                .addTagsItem(tags[5])
+                .addTagsItem(tags[6])
+                .addTagsItem(tags[7]);
     }
 }
