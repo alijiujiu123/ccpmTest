@@ -149,15 +149,15 @@ const CoverLetterPage: React.FC = () => {
 
   const userMenu = (
     <Menu>
-      <Item key="profile" icon={<UserOutlined />}>
+      <Menu.Item key="profile" icon={<UserOutlined />}>
         个人资料
-      </Item>
-      <Item key="settings" icon={<SettingOutlined />}>
+      </Menu.Item>
+      <Menu.Item key="settings" icon={<SettingOutlined />}>
         设置
-      </Item>
-      <Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+      </Menu.Item>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
         退出登录
-      </Item>
+      </Menu.Item>
     </Menu>
   );
 

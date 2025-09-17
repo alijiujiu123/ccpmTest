@@ -1,12 +1,15 @@
 package com.cvagent.service;
 
 import com.cvagent.model.OptimizationRule;
+import com.cvagent.model.User;
 import com.cvagent.repository.OptimizationRuleRepository;
+import com.cvagent.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -20,14 +23,41 @@ public class DatabaseInitializationService {
     @Autowired
     private OptimizationRuleRepository optimizationRuleRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @EventListener(ApplicationReadyEvent.class)
     public void initializeDatabase() {
         logger.info("开始初始化数据库数据...");
+
+        // 初始化测试用户
+        initializeTestUser();
 
         // 初始化简历优化规则
         initializeOptimizationRules();
 
         logger.info("数据库数据初始化完成");
+    }
+
+    private void initializeTestUser() {
+        // 检查是否已存在测试用户
+        if (userRepository.findByUsername("admin").isPresent()) {
+            logger.info("测试用户已存在，跳过初始化");
+            return;
+        }
+
+        User admin = new User();
+        admin.setUsername("admin");
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setEmail("admin@test.com");
+        admin.setRoles(List.of("ADMIN"));
+        admin.setCreatedAt(java.time.LocalDateTime.now());
+
+        userRepository.save(admin);
+        logger.info("已创建测试用户: admin/admin123");
     }
 
     private void initializeOptimizationRules() {
