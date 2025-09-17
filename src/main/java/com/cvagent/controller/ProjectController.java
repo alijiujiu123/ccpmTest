@@ -8,6 +8,11 @@ import com.cvagent.repository.ResumeRepository;
 import com.cvagent.security.UserPrincipal;
 import com.cvagent.service.ProjectService;
 import com.cvagent.service.MarkdownService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/projects")
+@Tag(name = "项目管理", description = "项目的创建、查询、更新和删除相关接口")
 public class ProjectController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
@@ -42,8 +48,16 @@ public class ProjectController {
      * 创建项目
      */
     @PostMapping
+    @Operation(summary = "创建项目", description = "创建新的项目记录")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "创建成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> createProject(
+            @Parameter(description = "项目创建请求参数", required = true)
             @Valid @RequestBody ProjectCreateRequest request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 创建项目: {}", userPrincipal.getUsername(), request.getName());
@@ -87,7 +101,13 @@ public class ProjectController {
      * 获取用户的所有项目
      */
     @GetMapping
+    @Operation(summary = "获取项目列表", description = "获取当前用户的所有项目记录")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<List<Project>> getUserProjects(
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 查询所有项目", userPrincipal.getUsername());
@@ -103,8 +123,16 @@ public class ProjectController {
      * 根据简历ID获取项目
      */
     @GetMapping("/resume/{resumeId}")
+    @Operation(summary = "根据简历获取项目", description = "获取指定简历关联的所有项目")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "404", description = "简历不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<List<Project>> getProjectsByResume(
+            @Parameter(description = "简历ID", required = true, example = "resume123")
             @PathVariable String resumeId,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 查询简历 {} 的项目", userPrincipal.getUsername(), resumeId);
@@ -120,8 +148,16 @@ public class ProjectController {
      * 根据ID获取项目
      */
     @GetMapping("/{id}")
+    @Operation(summary = "获取项目详情", description = "根据项目ID获取项目详细信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> getProjectById(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 查询项目: {}", userPrincipal.getUsername(), id);
@@ -137,9 +173,19 @@ public class ProjectController {
      * 更新项目
      */
     @PutMapping("/{id}")
+    @Operation(summary = "更新项目", description = "更新指定项目的信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> updateProject(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(description = "项目更新请求参数", required = true)
             @Valid @RequestBody ProjectCreateRequest request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 更新项目: {}", userPrincipal.getUsername(), id);
@@ -178,8 +224,16 @@ public class ProjectController {
      * 删除项目
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "删除项目", description = "删除指定的项目记录")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "删除成功"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Void> deleteProject(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 删除项目: {}", userPrincipal.getUsername(), id);
@@ -195,8 +249,16 @@ public class ProjectController {
      * 搜索项目
      */
     @PostMapping("/search")
+    @Operation(summary = "搜索项目", description = "根据条件搜索项目")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "搜索成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Page<Project>> searchProjects(
+            @Parameter(description = "项目搜索请求参数", required = true)
             @Valid @RequestBody ProjectSearchRequest request,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 搜索项目", userPrincipal.getUsername());
@@ -227,7 +289,13 @@ public class ProjectController {
      * 获取项目统计信息
      */
     @GetMapping("/statistics")
+    @Operation(summary = "获取项目统计", description = "获取项目相关的统计信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Map<String, Object>> getProjectStatistics(
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 查询项目统计", userPrincipal.getUsername());
@@ -243,9 +311,19 @@ public class ProjectController {
      * 添加项目标签
      */
     @PostMapping("/{id}/tags")
+    @Operation(summary = "添加项目标签", description = "为指定项目添加标签")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "添加成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> addProjectTag(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(description = "标签名称", required = true, example = "Java")
             @RequestParam String tag,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 为项目 {} 添加标签: {}", userPrincipal.getUsername(), id, tag);
@@ -261,9 +339,18 @@ public class ProjectController {
      * 移除项目标签
      */
     @DeleteMapping("/{id}/tags/{tag}")
+    @Operation(summary = "移除项目标签", description = "从指定项目中移除标签")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "移除成功"),
+        @ApiResponse(responseCode = "404", description = "项目或标签不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> removeProjectTag(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(description = "标签名称", required = true, example = "Java")
             @PathVariable String tag,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 为项目 {} 移除标签: {}", userPrincipal.getUsername(), id, tag);
@@ -279,9 +366,19 @@ public class ProjectController {
      * 更新项目状态
      */
     @PutMapping("/{id}/status")
+    @Operation(summary = "更新项目状态", description = "更新指定项目的状态")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> updateProjectStatus(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(description = "项目状态", required = true, example = "active")
             @RequestParam String status,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 更新项目 {} 状态为: {}", userPrincipal.getUsername(), id, status);
@@ -297,8 +394,16 @@ public class ProjectController {
      * 增加项目版本
      */
     @PostMapping("/{id}/version")
+    @Operation(summary = "增加项目版本", description = "增加指定项目的版本号")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> incrementProjectVersion(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 增加项目 {} 版本", userPrincipal.getUsername(), id);
@@ -314,7 +419,13 @@ public class ProjectController {
      * 获取所有标签
      */
     @GetMapping("/tags")
+    @Operation(summary = "获取所有标签", description = "获取用户的所有项目标签")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<List<String>> getAllTags(
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 查询所有标签", userPrincipal.getUsername());
@@ -330,8 +441,15 @@ public class ProjectController {
      * 根据标签搜索项目
      */
     @GetMapping("/tag/{tag}")
+    @Operation(summary = "根据标签搜索项目", description = "根据指定标签搜索项目")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "搜索成功"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<List<Project>> searchProjectsByTag(
+            @Parameter(description = "标签名称", required = true, example = "Java")
             @PathVariable String tag,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 根据标签搜索项目: {}", userPrincipal.getUsername(), tag);
@@ -347,8 +465,16 @@ public class ProjectController {
      * 处理项目Markdown内容
      */
     @GetMapping("/{id}/markdown")
+    @Operation(summary = "处理Markdown内容", description = "处理项目的Markdown内容")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "处理成功"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Map<String, Object>> processProjectMarkdown(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 处理项目 {} 的Markdown内容", userPrincipal.getUsername(), id);
@@ -365,9 +491,19 @@ public class ProjectController {
      * 批量更新项目标签
      */
     @PostMapping("/{id}/tags/batch")
+    @Operation(summary = "批量更新标签", description = "批量更新项目的标签")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "项目不存在"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Project> batchUpdateProjectTags(
+            @Parameter(description = "项目ID", required = true, example = "project123")
             @PathVariable String id,
+            @Parameter(description = "标签列表", required = true)
             @RequestBody List<String> tags,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 批量更新项目 {} 的标签", userPrincipal.getUsername(), id);
@@ -389,7 +525,13 @@ public class ProjectController {
      * 获取标签云数据
      */
     @GetMapping("/tags/cloud")
+    @Operation(summary = "获取标签云", description = "获取项目的标签云数据")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Map<String, Object>> getTagCloud(
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 获取标签云数据", userPrincipal.getUsername());
@@ -424,8 +566,16 @@ public class ProjectController {
      * 智能项目搜索（综合搜索）
      */
     @PostMapping("/smart-search")
+    @Operation(summary = "智能搜索", description = "综合搜索项目，支持多种条件过滤")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "搜索成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "401", description = "未登录或token已过期")
+    })
     public ResponseEntity<Map<String, Object>> smartSearchProjects(
+            @Parameter(description = "搜索参数", required = true)
             @RequestBody Map<String, Object> searchParams,
+            @Parameter(hidden = true)
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         logger.info("用户 {} 执行智能项目搜索", userPrincipal.getUsername());
