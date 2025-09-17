@@ -6,6 +6,11 @@ import com.cvagent.service.CoverLetterExportService;
 import com.cvagent.service.CoverLetterGenerationService;
 import com.cvagent.repository.CoverLetterRepository;
 import com.cvagent.repository.CoverLetterTemplateRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,6 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/cover-letters")
 @CrossOrigin(origins = "*")
+@Tag(name = "求职信管理", description = "求职信的生成、管理、优化和导出相关接口")
 public class CoverLetterController {
 
     @Autowired
@@ -40,9 +46,17 @@ public class CoverLetterController {
      * 获取用户的求职信列表
      */
     @GetMapping
+    @Operation(summary = "获取求职信列表", description = "获取用户的求职信列表，支持按状态和生成方式筛选")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
     public ResponseEntity<List<CoverLetter>> getUserCoverLetters(
+            @Parameter(description = "用户ID", required = true, example = "user123")
             @RequestParam String userId,
+            @Parameter(description = "求职信状态", required = false, example = "draft")
             @RequestParam(required = false) String status,
+            @Parameter(description = "生成方式", required = false, example = "ai")
             @RequestParam(required = false) String generatedBy) {
 
         List<CoverLetter> coverLetters;
@@ -62,7 +76,14 @@ public class CoverLetterController {
      * 根据ID获取求职信详情
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CoverLetter> getCoverLetterById(@PathVariable String id) {
+    @Operation(summary = "获取求职信详情", description = "根据求职信ID获取详细信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
+    public ResponseEntity<CoverLetter> getCoverLetterById(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
+            @PathVariable String id) {
         CoverLetter coverLetter = coverLetterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("求职信不存在"));
 
@@ -76,7 +97,14 @@ public class CoverLetterController {
      * 创建基于模板的基础求职信
      */
     @PostMapping("/basic")
-    public ResponseEntity<CoverLetter> createBasicCoverLetter(@RequestBody Map<String, Object> request) {
+    @Operation(summary = "创建基础求职信", description = "基于模板创建基础求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "创建成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<CoverLetter> createBasicCoverLetter(
+            @Parameter(description = "求职信创建请求参数", required = true)
+            @RequestBody Map<String, Object> request) {
         String userId = (String) request.get("userId");
         String templateId = (String) request.get("templateId");
         @SuppressWarnings("unchecked")
@@ -90,7 +118,14 @@ public class CoverLetterController {
      * 创建个性化求职信（基于简历和招聘需求）
      */
     @PostMapping("/personalized")
-    public ResponseEntity<CoverLetter> createPersonalizedCoverLetter(@RequestBody Map<String, Object> request) {
+    @Operation(summary = "创建个性化求职信", description = "基于简历和招聘需求创建个性化求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "创建成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<CoverLetter> createPersonalizedCoverLetter(
+            @Parameter(description = "个性化求职信创建请求参数", required = true)
+            @RequestBody Map<String, Object> request) {
         String userId = (String) request.get("userId");
         String resumeId = (String) request.get("resumeId");
         String jobRequirementId = (String) request.get("jobRequirementId");
@@ -108,8 +143,16 @@ public class CoverLetterController {
      * 优化现有求职信
      */
     @PostMapping("/{id}/optimize")
+    @Operation(summary = "优化求职信", description = "优化现有的求职信内容")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "优化成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<CoverLetter> optimizeCoverLetter(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "优化选项", required = true)
             @RequestBody Map<String, Object> optimizationOptions) {
 
         CoverLetter optimizedCoverLetter = coverLetterGenerationService.optimizeCoverLetter(id, optimizationOptions);
@@ -120,8 +163,16 @@ public class CoverLetterController {
      * 定制化求职信内容
      */
     @PutMapping("/{id}/customize")
+    @Operation(summary = "定制化求职信", description = "定制化求职信的内容")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "定制化成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<CoverLetter> customizeCoverLetter(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "定制化选项", required = true)
             @RequestBody Map<String, Object> customizations) {
 
         CoverLetter customizedCoverLetter = coverLetterGenerationService.customizeCoverLetter(id, customizations);
@@ -132,8 +183,16 @@ public class CoverLetterController {
      * 复制求职信
      */
     @PostMapping("/{id}/copy")
+    @Operation(summary = "复制求职信", description = "复制现有的求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "复制成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<CoverLetter> copyCoverLetter(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "复制请求参数，包含新标题", required = true)
             @RequestBody Map<String, String> request) {
 
         String newTitle = request.get("newTitle");
@@ -145,7 +204,14 @@ public class CoverLetterController {
      * 删除求职信
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCoverLetter(@PathVariable String id) {
+    @Operation(summary = "删除求职信", description = "删除指定的求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "删除成功"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
+    public ResponseEntity<Void> deleteCoverLetter(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
+            @PathVariable String id) {
         if (!coverLetterRepository.existsById(id)) {
             throw new RuntimeException("求职信不存在");
         }
@@ -158,8 +224,16 @@ public class CoverLetterController {
      * 更新求职信状态
      */
     @PatchMapping("/{id}/status")
+    @Operation(summary = "更新求职信状态", description = "更新求职信的状态")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<Void> updateCoverLetterStatus(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "状态更新请求参数", required = true)
             @RequestBody Map<String, String> request) {
 
         String status = request.get("status");
@@ -171,7 +245,14 @@ public class CoverLetterController {
      * 获取求职信建议
      */
     @GetMapping("/{id}/suggestions")
-    public ResponseEntity<Map<String, Object>> getCoverLetterSuggestions(@PathVariable String id) {
+    @Operation(summary = "获取求职信建议", description = "获取求职信的优化建议")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
+    public ResponseEntity<Map<String, Object>> getCoverLetterSuggestions(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
+            @PathVariable String id) {
         Map<String, Object> suggestions = coverLetterGenerationService.getCoverLetterSuggestions(id);
         return ResponseEntity.ok(suggestions);
     }
@@ -180,8 +261,15 @@ public class CoverLetterController {
      * 搜索求职信
      */
     @GetMapping("/search")
+    @Operation(summary = "搜索求职信", description = "根据关键词搜索求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "搜索成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
     public ResponseEntity<List<CoverLetter>> searchCoverLetters(
+            @Parameter(description = "用户ID", required = true, example = "user123")
             @RequestParam String userId,
+            @Parameter(description = "搜索关键词", required = true, example = "Java")
             @RequestParam String keyword) {
 
         List<CoverLetter> results = coverLetterRepository.searchByUserAndKeyword(userId, keyword);
@@ -192,8 +280,16 @@ public class CoverLetterController {
      * 导出求职信
      */
     @GetMapping("/{id}/export")
+    @Operation(summary = "导出求职信", description = "导出求职信为指定格式")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "导出成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<byte[]> exportCoverLetter(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "导出格式", required = true, example = "pdf")
             @RequestParam String format) {
 
         CoverLetterExportService.ExportResult result = coverLetterExportService.exportCoverLetter(id, format);
@@ -211,8 +307,16 @@ public class CoverLetterController {
      * 导出求职信和简历组合包
      */
     @PostMapping("/{id}/export-package")
+    @Operation(summary = "导出组合包", description = "导出求职信和简历的组合包")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "导出成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<byte[]> exportCombinedPackage(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "导出请求参数", required = true)
             @RequestBody Map<String, Object> request) {
 
         String format = (String) request.get("format");
@@ -233,9 +337,16 @@ public class CoverLetterController {
      * 获取求职信模板列表
      */
     @GetMapping("/templates")
+    @Operation(summary = "获取模板列表", description = "获取求职信模板列表，支持分类和关键词筛选")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功")
+    })
     public ResponseEntity<List<CoverLetterTemplate>> getCoverLetterTemplates(
+            @Parameter(description = "模板分类", required = false, example = "正式")
             @RequestParam(required = false) String category,
+            @Parameter(description = "模板风格", required = false, example = "简约")
             @RequestParam(required = false) String style,
+            @Parameter(description = "搜索关键词", required = false, example = "技术")
             @RequestParam(required = false) String keyword) {
 
         List<CoverLetterTemplate> templates;
@@ -259,7 +370,14 @@ public class CoverLetterController {
      * 获取求职信模板详情
      */
     @GetMapping("/templates/{id}")
-    public ResponseEntity<CoverLetterTemplate> getCoverLetterTemplateById(@PathVariable String id) {
+    @Operation(summary = "获取模板详情", description = "获取求职信模板的详细信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "404", description = "模板不存在")
+    })
+    public ResponseEntity<CoverLetterTemplate> getCoverLetterTemplateById(
+            @Parameter(description = "模板ID", required = true, example = "template123")
+            @PathVariable String id) {
         CoverLetterTemplate template = coverLetterTemplateRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("模板不存在"));
         return ResponseEntity.ok(template);
@@ -269,7 +387,14 @@ public class CoverLetterController {
      * 获取用户的求职信统计
      */
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getUserCoverLetterStats(@RequestParam String userId) {
+    @Operation(summary = "获取统计信息", description = "获取用户的求职信统计信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<Map<String, Object>> getUserCoverLetterStats(
+            @Parameter(description = "用户ID", required = true, example = "user123")
+            @RequestParam String userId) {
         Map<String, Object> stats = Map.of(
             "total", coverLetterRepository.countByUserId(userId),
             "draft", coverLetterRepository.countByUserIdAndStatus(userId, "draft"),
@@ -286,8 +411,15 @@ public class CoverLetterController {
      * 获取高匹配度的求职信
      */
     @GetMapping("/high-match")
+    @Operation(summary = "获取高匹配度求职信", description = "获取匹配度高于指定阈值的求职信")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
     public ResponseEntity<List<CoverLetter>> getHighMatchCoverLetters(
+            @Parameter(description = "用户ID", required = true, example = "user123")
             @RequestParam String userId,
+            @Parameter(description = "最小匹配度阈值", required = false, example = "0.7")
             @RequestParam(defaultValue = "0.7") double minScore) {
 
         List<CoverLetter> coverLetters = coverLetterRepository.findByUserIdAndMatchScoreGreaterThanOrderByMatchScoreDesc(userId, minScore);
@@ -298,7 +430,14 @@ public class CoverLetterController {
      * 获取需要优化的求职信
      */
     @GetMapping("/needs-optimization")
-    public ResponseEntity<List<CoverLetter>> getCoverLettersNeedingOptimization(@RequestParam String userId) {
+    @Operation(summary = "获取需优化的求职信", description = "获取需要AI优化的求职信列表")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<List<CoverLetter>> getCoverLettersNeedingOptimization(
+            @Parameter(description = "用户ID", required = true, example = "user123")
+            @RequestParam String userId) {
         List<CoverLetter> coverLetters = coverLetterRepository.findByUserIdAndAiOptimizedFalseOrderByGeneratedAtDesc(userId);
         return ResponseEntity.ok(coverLetters);
     }
@@ -307,7 +446,14 @@ public class CoverLetterController {
      * 批量更新求职信状态
      */
     @PatchMapping("/batch-status")
-    public ResponseEntity<Void> batchUpdateCoverLetterStatus(@RequestBody Map<String, Object> request) {
+    @Operation(summary = "批量更新状态", description = "批量更新多个求职信的状态")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<Void> batchUpdateCoverLetterStatus(
+            @Parameter(description = "批量更新请求参数", required = true)
+            @RequestBody Map<String, Object> request) {
         @SuppressWarnings("unchecked")
         List<String> coverLetterIds = (List<String>) request.get("coverLetterIds");
         String status = (String) request.get("status");
@@ -320,8 +466,16 @@ public class CoverLetterController {
      * 评分求职信
      */
     @PostMapping("/{id}/rate")
+    @Operation(summary = "评分求职信", description = "为求职信评分")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "评分成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "求职信不存在")
+    })
     public ResponseEntity<Void> rateCoverLetter(
+            @Parameter(description = "求职信ID", required = true, example = "letter123")
             @PathVariable String id,
+            @Parameter(description = "评分请求参数", required = true)
             @RequestBody Map<String, Object> request) {
 
         Double rating = (Double) request.get("rating");
@@ -336,7 +490,14 @@ public class CoverLetterController {
      * 获取最近修改的求职信
      */
     @GetMapping("/recent")
-    public ResponseEntity<List<CoverLetter>> getRecentCoverLetters(@RequestParam String userId) {
+    @Operation(summary = "获取最近修改的求职信", description = "获取最近修改的求职信列表")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "获取成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<List<CoverLetter>> getRecentCoverLetters(
+            @Parameter(description = "用户ID", required = true, example = "user123")
+            @RequestParam String userId) {
         List<CoverLetter> coverLetters = coverLetterRepository.findTop10ByUserIdOrderByLastModifiedAtDesc(userId);
         return ResponseEntity.ok(coverLetters);
     }
@@ -344,6 +505,8 @@ public class CoverLetterController {
     /**
      * 异常处理
      */
+    @Operation(summary = "异常处理", description = "处理运行时异常")
+    @ApiResponse(responseCode = "400", description = "请求处理失败")
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
